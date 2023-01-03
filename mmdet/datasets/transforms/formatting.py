@@ -21,10 +21,10 @@ class PackDetInputs(BaseTransform):
 
         - ``img_path``: path to the image file
 
-        - ``ori_shape``: original shape of the image as a tuple (h, w, c)
+        - ``ori_shape``: original shape of the image as a tuple (h, w)
 
         - ``img_shape``: shape of the image input to the network as a tuple \
-            (h, w, c).  Note that images may be zero padded on the \
+            (h, w).  Note that images may be zero padded on the \
             bottom/right if the batch tensor is larger than this shape.
 
         - ``scale_factor``: a float indicating the preprocessing scale
@@ -103,7 +103,10 @@ class PackDetInputs(BaseTransform):
         data_sample.ignored_instances = ignore_instance_data
 
         if 'proposals' in results:
-            data_sample.proposals = InstanceData(bboxes=results['proposals'])
+            proposals = InstanceData(
+                bboxes=to_tensor(results['proposals']),
+                scores=to_tensor(results['proposals_scores']))
+            data_sample.proposals = proposals
 
         if 'gt_seg_map' in results:
             gt_sem_seg_data = dict(
